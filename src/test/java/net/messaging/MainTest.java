@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class MainTest {
-
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -25,7 +24,7 @@ public class MainTest {
         args[1] = "Hi there!";
 
         obj.buildParameterMap(args);
-        Map<String, String> parameterMap = obj.getParameterMap();
+        Map<String, Object> parameterMap = obj.getParameterMap();
         assertThat(parameterMap, notNullValue());
         assertThat(parameterMap.size(), equalTo(2));
     }
@@ -122,6 +121,9 @@ public class MainTest {
 
     @Test
     public void testValidateInputParameters_nullMessageBody_expectException() throws Exception {
+        StringWriter network = new StringWriter();
+        Main.setNetwork(network);
+
         expectedException.expect(SMTPClientException.class);
         expectedException.expectMessage(SMTPClientConstants.INVALID_MESSAGE_BODY);
 
@@ -132,5 +134,20 @@ public class MainTest {
 
         obj.buildParameterMap(args);
         obj.validateInputParameters();
+    }
+
+    @Test
+    public void testValidateParameters_multipleInvalidEmailIds_expectException() throws Exception {
+        StringWriter console = new StringWriter();
+        Main.setConsole(console);
+
+        Main obj = new Main();
+        String[] args = new String[2];
+        args[0] = "joeexample.com,jeanexample.com";
+        args[1] = "message body!";
+
+        Main.main(args);
+
+        assertThat(console.toString(), equalTo("Invalid email address: joeexample.com,jeanexample.com\n"));
     }
 }

@@ -11,7 +11,7 @@ public class Main {
     private static Writer console;
     private static Logger logger = Logger.getLogger(Main.class.getName());
 
-    private static Map<String, String> parameterMap = new HashMap<>();
+    private static Map<String, Object> parameterMap = new HashMap<>();
 
     public static void main(String... args) {
         Main obj = new Main();
@@ -26,12 +26,25 @@ public class Main {
     }
 
     protected void validateInputParameters() throws SMTPClientException {
-        String receiver = parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
-        if (!receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
-            throw new SMTPClientException(SMTPClientConstants.INVALID_EMAIL_ADDRESS + " " + receiver);
+        String[] receivers = (String[])parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
+        String exceptionString = "";
+        int count = 0;
+        for (String receiver : receivers) {
+            if (count > 0 && !receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
+                exceptionString += SMTPClientConstants.RECEIVER_SEPARATOR + receiver;
+                count++;
+            }
+            else if (!receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
+                exceptionString += SMTPClientConstants.INVALID_EMAIL_ADDRESS + " " + receiver;
+                count++;
+            }
         }
 
-        String messageBody = parameterMap.get(SMTPClientConstants.MESSAGE_KEY);
+        if (!exceptionString.isEmpty()) {
+            throw new SMTPClientException(exceptionString);
+        }
+
+        String messageBody = (String)parameterMap.get(SMTPClientConstants.MESSAGE_KEY);
         if (messageBody == null || messageBody.isEmpty()) {
             throw new SMTPClientException(SMTPClientConstants.INVALID_MESSAGE_BODY);
         }
@@ -63,13 +76,16 @@ public class Main {
             network.append(SMTPClientConstants.SMTP_PROTOCOL);
             network.append((char)10);
 
-            network.append(SMTPClientConstants.TO_STRING);
-            network.append(" ");
-            network.append(parameterMap.get(SMTPClientConstants.RECEIVER_KEY));
-            network.append((char)10);
+            String[] receivers = (String[]) parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
+            for (String receiver : receivers) {
+                network.append(SMTPClientConstants.TO_STRING);
+                network.append(" ");
+                network.append(receiver);
+                network.append((char)10);
+            }
             network.append((char)10);
 
-            network.append(parameterMap.get(SMTPClientConstants.MESSAGE_KEY));
+            network.append((String)parameterMap.get(SMTPClientConstants.MESSAGE_KEY));
             network.append((char)10);
             network.append((char)10);
 
@@ -87,7 +103,9 @@ public class Main {
             throw new IllegalArgumentException("Invalid input arguments...");
         }
 
-        parameterMap.put(SMTPClientConstants.RECEIVER_KEY, args[0]);
+        String receiverString = args[0];
+        String[] receivers = receiverString.split(SMTPClientConstants.RECEIVER_SEPARATOR);
+        parameterMap.put(SMTPClientConstants.RECEIVER_KEY, receivers);
         parameterMap.put(SMTPClientConstants.MESSAGE_KEY, args[1]);
     }
 
@@ -100,7 +118,7 @@ public class Main {
     }
 
     // for unit tests.
-    protected Map<String, String> getParameterMap() {
+    protected Map<String, Object> getParameterMap() {
         return parameterMap;
     }
 }
