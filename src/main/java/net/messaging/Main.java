@@ -26,12 +26,16 @@ public class Main {
     }
 
     protected void validateInputParameters() throws SMTPClientException {
-        String[] receivers = (String[])parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
+        String[] receivers = (String[]) parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
         String exceptionString = "";
         int count = 0;
         for (String receiver : receivers) {
+            if (count == 1 && !receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
+                exceptionString = exceptionString.replace(SMTPClientConstants.INVALID_EMAIL_ADDRESS, SMTPClientConstants.INVALID_EMAIL_ADDRESSES);
+            }
+
             if (count > 0 && !receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
-                exceptionString += SMTPClientConstants.RECEIVER_SEPARATOR + receiver;
+                exceptionString += " " + receiver;
                 count++;
             }
             else if (!receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
@@ -76,7 +80,7 @@ public class Main {
             network.append(SMTPClientConstants.SMTP_PROTOCOL);
             network.append((char)10);
 
-            String[] receivers = (String[]) parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
+            String[] receivers = (String[])parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
             for (String receiver : receivers) {
                 network.append(SMTPClientConstants.TO_STRING);
                 network.append(" ");

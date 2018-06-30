@@ -138,16 +138,15 @@ public class MainTest {
 
     @Test
     public void testValidateParameters_multipleInvalidEmailIds_expectException() throws Exception {
-        StringWriter console = new StringWriter();
-        Main.setConsole(console);
+        expectedException.expect(SMTPClientException.class);
+        expectedException.expectMessage(SMTPClientConstants.INVALID_EMAIL_ADDRESSES);
 
         Main obj = new Main();
         String[] args = new String[2];
         args[0] = "joeexample.com,jeanexample.com";
         args[1] = "message body!";
 
-        Main.main(args);
-
-        assertThat(console.toString(), equalTo("Invalid email address: joeexample.com,jeanexample.com\n"));
+        obj.buildParameterMap(args);
+        obj.validateInputParameters();
     }
 }
