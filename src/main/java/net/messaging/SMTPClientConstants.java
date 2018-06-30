@@ -12,4 +12,5 @@ public class SMTPClientConstants {
     public static final String EMAIL_VALIDATOR = "@";
 
     public static final String INVALID_EMAIL_ADDRESS = "Invalid email address:";
+    public static final String INVALID_MESSAGE_BODY = "Cannot send an email with no body.";
 }

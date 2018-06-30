@@ -30,6 +30,11 @@ public class Main {
         if (!receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
             throw new SMTPClientException(SMTPClientConstants.INVALID_EMAIL_ADDRESS + " " + receiver);
         }
+
+        String messageBody = parameterMap.get(SMTPClientConstants.MESSAGE_KEY);
+        if (messageBody == null || messageBody.isEmpty()) {
+            throw new SMTPClientException(SMTPClientConstants.INVALID_MESSAGE_BODY);
+        }
     }
 
     protected void processErrorMessage(SMTPClientException exception) {

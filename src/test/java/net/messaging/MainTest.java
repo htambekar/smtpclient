@@ -103,7 +103,34 @@ public class MainTest {
         obj.processInputCommand();
 
         String consoleString = network.toString();
-        System.out.println(consoleString);
         assertThat(consoleString, containsString("connect smtp\nTo: joe@example.com\n\nHi there!\n\ndisconnect"));
+    }
+
+    @Test
+    public void testValidateInputParameters_emptyMessageBody_expectException() throws Exception {
+        expectedException.expect(SMTPClientException.class);
+        expectedException.expectMessage(SMTPClientConstants.INVALID_MESSAGE_BODY);
+
+        Main obj = new Main();
+        String[] args = new String[2];
+        args[0] = "joe@example.com";
+        args[1] = "";
+
+        obj.buildParameterMap(args);
+        obj.validateInputParameters();
+    }
+
+    @Test
+    public void testValidateInputParameters_nullMessageBody_expectException() throws Exception {
+        expectedException.expect(SMTPClientException.class);
+        expectedException.expectMessage(SMTPClientConstants.INVALID_MESSAGE_BODY);
+
+        Main obj = new Main();
+        String[] args = new String[2];
+        args[0] = "joe@example.com";
+        args[1] = null;
+
+        obj.buildParameterMap(args);
+        obj.validateInputParameters();
     }
 }
