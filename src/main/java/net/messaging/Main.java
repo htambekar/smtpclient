@@ -1,8 +1,8 @@
 package net.messaging;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,14 +17,37 @@ public class Main {
         Main obj = new Main();
         try {
             obj.buildParameterMap(args);
+            obj.validateInputParameters();
             obj.processInputCommand();
         }
-        catch (SMTPClientException e) {
-            logger.log(Level.SEVERE, e.getMessage()); //e.printStackTrace();
+        catch (SMTPClientException exception) {
+            obj.processErrorMessage(exception);
         }
     }
 
-    private void processInputCommand() throws SMTPClientException {
+    protected void validateInputParameters() throws SMTPClientException {
+        String receiver = parameterMap.get(SMTPClientConstants.RECEIVER_KEY);
+        if (!receiver.contains(SMTPClientConstants.EMAIL_VALIDATOR)) {
+            throw new SMTPClientException(SMTPClientConstants.INVALID_EMAIL_ADDRESS + " " + receiver);
+        }
+    }
+
+    protected void processErrorMessage(SMTPClientException exception) {
+        if (console == null) {
+            console = new StringWriter();
+        }
+
+        try {
+            console.append(exception.getMessage());
+            console.append((char)10);
+            console.flush();
+        }
+        catch (IOException e) {
+            logger.log(Level.SEVERE, "Error while writing to console..." + e.getMessage());
+        }
+    }
+
+    protected void processInputCommand() {
         if (network == null) {
             network = new StringWriter();
         }
@@ -50,11 +73,11 @@ public class Main {
             network.flush();
         }
         catch (IOException e) {
-            throw new SMTPClientException("Error while processing input command...");
+            logger.log(Level.SEVERE, "Error while processing input command..." + e.getMessage());
         }
     }
 
-    private void buildParameterMap(String[] args) {
+    protected void buildParameterMap(String[] args) {
         if (args == null || args.length < 2) {
             throw new IllegalArgumentException("Invalid input arguments...");
         }
@@ -69,5 +92,10 @@ public class Main {
 
     public static void setConsole(Writer console) {
         Main.console = console;
+    }
+
+    // for unit tests.
+    protected Map<String, String> getParameterMap() {
+        return parameterMap;
     }
 }
