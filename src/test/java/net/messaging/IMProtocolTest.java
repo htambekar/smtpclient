@@ -19,4 +19,15 @@ public class IMProtocolTest {
         String message = imProtocol.getNetworkString();
         assertThat(message, equalTo("connect chat\n<joe@example.com>(Hi there!)\ndisconnect\n"));
     }
+
+    @Test
+    public void testSendMessage_multipleUsers() throws Exception {
+        String[] receivers = {"joe@example.com", "sally@example.com"};
+        ImMessageTransformer imProtocol = new ImMessageTransformer("Hi there!", receivers);
+        ImMessageTransformer.setNetwork(new StringWriter());
+        imProtocol.sendMessage();
+
+        String message = imProtocol.getNetworkString();
+        assertThat(message, equalTo("connect chat\n<joe@example.com>(Hi there!)\n<sally@example.com>(Hi there!)\ndisconnect\n"));
+    }
 }
