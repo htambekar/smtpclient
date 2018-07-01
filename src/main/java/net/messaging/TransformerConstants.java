@@ -18,4 +18,5 @@ public class TransformerConstants {
     public static final String INVALID_EMAIL_ADDRESS = "Invalid email address:";
     public static final String INVALID_MESSAGE_BODY = "Cannot send an email with no body.";
     public static final String INVALID_EMAIL_ADDRESSES = "Invalid email addresses:";
+    public static final String CONNECTION_ERROR = "Connection error. Please try again.";
 }

@@ -14,33 +14,28 @@ public class ImMessageTransformer extends AbstractMessageTransformer implements 
     }
 
     @Override
-    public void sendMessage() {
+    public void sendMessage() throws IOException {
         if (network == null) {
             network = new StringWriter();
         }
 
-        try {
-            network.append(TransformerConstants.CONNECT_STRING);
-            network.append(" ");
-            network.append(TransformerConstants.CHAT_PROTOCOL);
-            network.append((char)10);
+        network.append(TransformerConstants.CONNECT_STRING);
+        network.append(" ");
+        network.append(TransformerConstants.CHAT_PROTOCOL);
+        network.append((char)10);
 
-            for (String receiver : this.receivers) {
-                network.append("<");
-                network.append(receiver);
-                network.append(">");
-                network.append("(");
-                network.append(this.message);
-                network.append(")");
-                network.append((char)10);
-            }
-
-            network.append(TransformerConstants.DISCONNECT_STRING);
+        for (String receiver : this.receivers) {
+            network.append("<");
+            network.append(receiver);
+            network.append(">");
+            network.append("(");
+            network.append(this.message);
+            network.append(")");
             network.append((char)10);
-            network.flush();
         }
-        catch (IOException e) {
-            logger.log(Level.SEVERE, "Error while processing input command..." + e.getMessage());
-        }
+
+        network.append(TransformerConstants.DISCONNECT_STRING);
+        network.append((char)10);
+        network.flush();
     }
 }

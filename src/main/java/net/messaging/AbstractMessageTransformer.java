@@ -20,7 +20,7 @@ public abstract class AbstractMessageTransformer implements MessageTransformer {
         this.receivers = receivers;
     }
 
-    public abstract void sendMessage();
+    public abstract void sendMessage() throws IOException;
 
     public void validateInputParameters() throws ClientException {
         String exceptionString = "";
@@ -49,17 +49,21 @@ public abstract class AbstractMessageTransformer implements MessageTransformer {
         }
     }
 
-    public void displayErrorMessage(ClientException exception) {
+    public void displayErrorMessage(ClientException e) {
+        displayErrorMessage(e.getMessage());
+    }
+
+    public void displayErrorMessage(String errorMessage) {
         if (console == null) {
             console = new StringWriter();
         }
 
-        if (exception == null) {
+        if (errorMessage == null) {
             return;
         }
 
         try {
-            console.append(exception.getMessage());
+            console.append(errorMessage);
             console.append((char)10);
             console.flush();
         }
@@ -72,6 +76,9 @@ public abstract class AbstractMessageTransformer implements MessageTransformer {
         try {
             validateInputParameters();
             sendMessage();
+        }
+        catch (IOException e) {
+            displayErrorMessage(TransformerConstants.CONNECTION_ERROR);
         }
         catch (ClientException exception) {
             displayErrorMessage(exception);

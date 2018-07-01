@@ -14,35 +14,30 @@ public class SmtpMessageTransformer extends AbstractMessageTransformer implement
     }
 
     @Override
-    public void sendMessage() {
+    public void sendMessage() throws IOException {
         if (network == null) {
             network = new StringWriter();
         }
 
-        try {
-            network.append(TransformerConstants.CONNECT_STRING);
+        network.append(TransformerConstants.CONNECT_STRING);
+        network.append(" ");
+        network.append(TransformerConstants.SMTP_PROTOCOL);
+        network.append((char)10);
+
+        for (String receiver : this.receivers) {
+            network.append(TransformerConstants.TO_STRING);
             network.append(" ");
-            network.append(TransformerConstants.SMTP_PROTOCOL);
+            network.append(receiver);
             network.append((char)10);
-
-            for (String receiver : this.receivers) {
-                network.append(TransformerConstants.TO_STRING);
-                network.append(" ");
-                network.append(receiver);
-                network.append((char)10);
-            }
-            network.append((char)10);
-
-            network.append(this.message);
-            network.append((char)10);
-            network.append((char)10);
-
-            network.append(TransformerConstants.DISCONNECT_STRING);
-            network.append((char)10);
-            network.flush();
         }
-        catch (IOException e) {
-            logger.log(Level.SEVERE, "Error while processing input command..." + e.getMessage());
-        }
+        network.append((char)10);
+
+        network.append(this.message);
+        network.append((char)10);
+        network.append((char)10);
+
+        network.append(TransformerConstants.DISCONNECT_STRING);
+        network.append((char)10);
+        network.flush();
     }
 }

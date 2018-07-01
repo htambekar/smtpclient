@@ -78,6 +78,17 @@ public class AbstractMessageTransformerTest {
     }
 
     @Test
+    public void testDisplayErrorMessage_errroMsgAsString() throws Exception {
+        String[] receivers = { "joe@example.com" };
+        StringWriter console = new StringWriter();
+        SmtpMessageTransformer.setConsole(console);
+        SmtpMessageTransformer smtpProtocol = new SmtpMessageTransformer("Hi there!", receivers);
+        smtpProtocol.displayErrorMessage("error_message");
+        String consoleString = smtpProtocol.getConsoleString();
+        assertThat(consoleString, equalTo("error_message\n"));
+    }
+
+    @Test
     public void testProcessInputCommand() throws Exception {
         String[] receivers = { "joe@example.com" };
         StringWriter console = new StringWriter();
